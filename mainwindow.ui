@@ -21,50 +21,7 @@
     <property name="sizeConstraint">
      <enum>QLayout::SetDefaultConstraint</enum>
     </property>
-    <item row="0" column="1">
-     <widget class="QTreeWidget" name="treeWidget">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>150</width>
-        <height>16777215</height>
-       </size>
-      </property>
-      <property name="contextMenuPolicy">
-       <enum>Qt::ActionsContextMenu</enum>
-      </property>
-      <property name="sortingEnabled">
-       <bool>true</bool>
-      </property>
-      <column>
-       <property name="text">
-        <string>States</string>
-       </property>
-      </column>
-     </widget>
-    </item>
-    <item row="0" column="0">
-     <widget class="child" name="widget" native="true">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>400</width>
-        <height>16777215</height>
-       </size>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="0">
+    <item row="4" column="0">
      <widget class="CSubs" name="widget_2" native="true">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -83,10 +40,76 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="1">
+    <item row="1" column="0">
+     <widget class="child" name="widget" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>400</width>
+        <height>16777215</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="2">
      <widget class="QPushButton" name="pushButton">
+      <property name="maximumSize">
+       <size>
+        <width>100</width>
+        <height>16777215</height>
+       </size>
+      </property>
       <property name="text">
        <string>add state</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="2">
+     <widget class="QTreeWidget" name="treeWidget">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>100</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="contextMenuPolicy">
+       <enum>Qt::ActionsContextMenu</enum>
+      </property>
+      <property name="sortingEnabled">
+       <bool>true</bool>
+      </property>
+      <column>
+       <property name="text">
+        <string>States</string>
+       </property>
+      </column>
+     </widget>
+    </item>
+    <item row="2" column="2">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>コメント</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="2">
+     <widget class="QTextEdit" name="textEdit">
+      <property name="maximumSize">
+       <size>
+        <width>100</width>
+        <height>16777215</height>
+       </size>
       </property>
      </widget>
     </item>
@@ -105,6 +128,7 @@
     <property name="title">
      <string>menu</string>
     </property>
+    <addaction name="actionSave"/>
    </widget>
    <addaction name="menuMenu"/>
   </widget>
@@ -120,6 +144,11 @@
   <action name="actionAdd">
    <property name="text">
     <string>add</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="text">
+    <string>save</string>
    </property>
   </action>
  </widget>
@@ -172,8 +201,26 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionSave</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>JsonExport()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>312</x>
+     <y>235</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>statesadd()</slot>
+  <slot>JsonExport()</slot>
+  <slot>slot2()</slot>
  </slots>
 </ui>

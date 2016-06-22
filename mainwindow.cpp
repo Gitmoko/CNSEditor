@@ -2,6 +2,11 @@
 #include "ui_mainwindow.h"
 #include "states.h"
 #include "addstatesdialog.h"
+#include "QJsonDocument"
+#include "QJsonObject"
+#include "QJsonArray"
+#include "QFile"
+#include "QDebug"
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -11,8 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->treeWidget,&QTreeWidget::currentItemChanged,this,[=](QTreeWidgetItem* next,QTreeWidgetItem* prev){
         if(prev != nullptr){
             int prevstate = prev->text(0).toInt();
-            data[prevstate].first = ui->widget->gettriggers();
-            data[prevstate].second = ui->widget_2->getsubs();
+            this->savenoweditting(prevstate);
 
 
             int nextstate = next->text(0).toInt();
@@ -48,4 +52,45 @@ void MainWindow::statesadd(){
             [=](int r){
         this->setEnabled(true);
     });
+}
+
+void MainWindow::JsonExport(){
+    QFile json(tr("test.json"));
+    if(!json.open(QIODevice::WriteOnly)){
+        return;
+    }
+
+    savenoweditting( ui->treeWidget->currentItem()->text(0).toInt());
+
+    QJsonArray cns;
+
+    auto keys = data.keys();
+    for(auto it = keys.begin(),end = keys.end(); it != end; it++){
+        auto key = *it;
+        QJsonArray trigs;
+        for(auto& trig: data[key].first){
+            trigs.append(QJsonValue{trig});
+        }
+
+        QJsonArray subss;
+        for(auto& subsdata : data[key].second){
+            QJsonObject subs;
+            subs["left"] = subsdata.first;
+            subs["right"] = subsdata.second;
+            subss.append(subs);
+        }
+        QJsonObject state;
+        state["state"] = key;
+        state["triggers"] = QJsonValue{trigs};
+        state["substitutions"] = QJsonValue{subss};
+        cns.append(QJsonValue{state});
+    }
+
+    QJsonDocument doc(cns);
+    json.write(doc.toJson());
+}
+
+void MainWindow::savenoweditting(int state){
+    data[state].first = ui->widget->gettriggers();
+    data[state].second = ui->widget_2->getsubs();
 }

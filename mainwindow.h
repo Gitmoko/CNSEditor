@@ -21,8 +21,13 @@ public:
     ~MainWindow();
 public slots:
     void statesadd();
+    void JsonExport();
 public:
     Data data;
+
+private:
+    void savenoweditting(int state);
+
 private:
     Ui::MainWindow *ui;
 };
