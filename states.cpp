@@ -25,6 +25,15 @@ int States::getstate(){
     return this->text(0).toInt();
 }
 
+int States::findchild(QTreeWidgetItem* arg){
+    int childnum = this->childCount();
+    for(auto i = 0; i<childnum;i++){
+     if(arg == this->child(i))
+         return i;
+    }
+    return -1;
+}
+
 States::~States(){
 
 }

@@ -39,7 +39,7 @@
        <enum>Qt::ActionsContextMenu</enum>
       </property>
       <property name="sortingEnabled">
-       <bool>true</bool>
+       <bool>false</bool>
       </property>
       <column>
        <property name="text">
@@ -66,7 +66,7 @@
      </widget>
     </item>
     <item row="10" column="0">
-     <widget class="CSubs" name="widget_2" native="true">
+     <widget class="CSubs" name="substitutions" native="true">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
         <horstretch>0</horstretch>
@@ -85,7 +85,7 @@
      </widget>
     </item>
     <item row="6" column="0">
-     <widget class="child" name="widget" native="true">
+     <widget class="child" name="triggers" native="true">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
         <horstretch>0</horstretch>

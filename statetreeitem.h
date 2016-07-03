@@ -11,9 +11,6 @@ public:
     explicit StateTreeItem();
     ~StateTreeItem();
 
-public:
-    enum DATATYPE : int{STATEDEF,STATEBODY};
-    StateTreeItem::DATATYPE tag = STATEDEF;
 
 private:
 };

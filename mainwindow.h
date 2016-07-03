@@ -8,6 +8,7 @@
 #include "child.h"
 #include "QTreeWidgetItem"
 #include <functional>
+#include "cns.h"
 
 namespace Ui {
 class MainWindow;
@@ -27,12 +28,12 @@ public slots:
     void JsonExport();
 
 public:
-    Data data;
+    CNS::CNS data;
 
 private:
-    void savenoweditting(int state);
+    void saveeditting(QTreeWidgetItem*);
     void createstatedialog(std::function<void(int)> f);
-    void changeDataState(int pre,int next);
+    void renameNumberOfState(int pre,int next);
     QList<QTreeWidgetItem*> findstate(int r);
 
 private:

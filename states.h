@@ -17,6 +17,7 @@ public:
     virtual bool operator < (const QTreeWidgetItem & other) const;
     void setstate(int);
     int getstate();
+    int findchild(QTreeWidgetItem*);
     ~States();
 
 };

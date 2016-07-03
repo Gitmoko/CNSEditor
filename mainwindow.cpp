@@ -13,25 +13,21 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->treeWidget->addAction(ui->actionAdd);
     connect(ui->treeWidget,&QTreeWidget::currentItemChanged,this,[=](QTreeWidgetItem* next,QTreeWidgetItem* prev){
 
+        saveeditting(prev);
 
-        if(prev != nullptr){
-            auto d = prev->columnCount();
-            if(d == 2)
-                return;
-
-            int prevstate = prev->text(0).toInt();
-            this->savenoweditting(prevstate);
-
-
-            int nextstate = next->text(0).toInt();
-            auto& trig = data[nextstate].first;
-            auto& subs = data[nextstate].second;
-
-            this->ui->widget->setelems(trig);
-            this->ui->widget_2->setelems(subs);
+        //load selected state
+        if(auto statedef = dynamic_cast<States*>(next)){
+            int state = statedef->getstate();
+            ui->substitutions->setelems(data.cns[state].first.substitutions);
+        }
+        else if(auto statebody = dynamic_cast<StateTreeItem*>(next)){
+            auto parent = dynamic_cast<States*>(statebody->parent());
+            int state = parent->getstate();
+            int at = parent->findchild(statebody);
+            ui->triggers->setelems(data.cns[state].second[at].triggers);
+            ui->substitutions->setelems(data.cns[state].second[at].substitutions);
         }
 
 
@@ -43,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent) :
             createstatedialog([=](int next){
                if( findstate(next).size() == 0){
                    i->setstate(next);
-                   changeDataState(pre,next);
+                   renameNumberOfState(pre,next);
                }
             });
         }
@@ -68,11 +64,22 @@ void MainWindow::statesadd(){
 
 void MainWindow::statebodyadd(){
     auto nowselect = ui->treeWidget->currentItem();
-    if(nowselect != nullptr){
-        auto body = new StateTreeItem();
-        body->setFlags(body->flags());
-        body->setText(0,"comment");
-        nowselect->addChild(body);
+
+    auto body = new StateTreeItem();
+    body->setFlags(body->flags() | Qt::ItemIsEditable);
+    body->setText(0,"comment");
+
+    QVariant state;
+    if(auto statedef = dynamic_cast<States*>(nowselect)){
+        statedef->addChild(body);
+        state = statedef->getstate();
+    }else if(auto statebody = dynamic_cast<StateTreeItem*>(nowselect)){
+        auto statedef = dynamic_cast<States*>(statebody->parent());
+        statedef->addChild(body);
+        state = statedef->getstate();
+    }
+    if(!state.isNull()){
+    data.cns[state.toInt()].second.append(*(new CNS::StateBody()));
     }
 }
 
@@ -83,39 +90,70 @@ void MainWindow::JsonExport(){
         return;
     }
 
-    savenoweditting( ui->treeWidget->currentItem()->text(0).toInt());
+    saveeditting(ui->treeWidget->currentItem());
 
     QJsonArray cns;
 
-    auto keys = data.keys();
+    auto keys = data.cns.keys();
     for(auto it = keys.begin(),end = keys.end(); it != end; it++){
         auto key = *it;
-        QJsonArray trigs;
-        for(auto& trig: data[key].first){
-            trigs.append(QJsonValue{trig});
-        }
 
-        QJsonArray subss;
-        for(auto& subsdata : data[key].second){
+        QJsonArray defsubss;
+        for(auto& subsdata : data.cns[key].first.substitutions){
             QJsonObject subs;
             subs["left"] = subsdata.first;
             subs["right"] = subsdata.second;
-            subss.append(subs);
+            defsubss.append(subs);
         }
-        QJsonObject state;
-        state["state"] = key;
-        state["triggers"] = QJsonValue{trigs};
-        state["substitutions"] = QJsonValue{subss};
-        cns.append(QJsonValue{state});
+
+        QJsonArray statebody;
+        for(auto& bodyelem: data.cns[key].second){
+            QJsonArray bodytrigs;
+            for(auto& trig: bodyelem.triggers){
+            bodytrigs.append(QJsonValue{trig});
+            }
+
+            QJsonArray bodysubss;
+            for(auto& subsdata : bodyelem.substitutions){
+                QJsonObject subs;
+                subs["left"] = subsdata.first;
+                subs["right"] = subsdata.second;
+                bodysubss.append(subs);
+            }
+            QJsonObject body;
+            body["triggers"] = QJsonValue(bodytrigs);
+            body["substitutions"] = QJsonValue(bodysubss);
+            statebody.append(body);
+        }
+        QJsonObject statedef;
+        statedef["substitutions"] = QJsonValue(defsubss);
+        statedef["comment"] = "defcomment";
+        QJsonObject statedata;
+        statedata["StateDef"] = QJsonValue(statedef);
+        statedata["States"] = QJsonValue(statebody);
+        QJsonObject cnselem;
+        cnselem["StateNum"] = key;
+        cnselem["StateData"] = statedata;
+        cns.append(QJsonValue(cnselem));
     }
 
     QJsonDocument doc(cns);
     json.write(doc.toJson());
 }
 
-void MainWindow::savenoweditting(int state){
-    data[state].first = ui->widget->gettriggers();
-    data[state].second = ui->widget_2->getsubs();
+void MainWindow::saveeditting(QTreeWidgetItem* elem){
+    //save now editting
+    if(auto statedef = dynamic_cast<States*>(elem)){
+        int state = statedef->getstate();
+        data.cns[state].first.substitutions = ui->substitutions->getsubs();
+    }
+    else if(auto statebody = dynamic_cast<StateTreeItem*>(elem)){
+        auto parent = dynamic_cast<States*>(statebody->parent());
+        int state = parent->getstate();
+        int at = parent->findchild(statebody);
+        data.cns[state].second[at].triggers = ui->triggers->gettriggers();
+        data.cns[state].second[at].substitutions = ui->substitutions->getsubs();
+    }
 }
 
 QList<QTreeWidgetItem*> MainWindow::findstate(int r){
@@ -134,7 +172,7 @@ QList<QTreeWidgetItem*> MainWindow::findstate(int r){
 
  }
 
- void MainWindow::changeDataState(int pre,int next){
-     data[next] = data[pre];
-     data.remove(pre);
+ void MainWindow::renameNumberOfState(int pre,int next){
+     data.cns[next] = data.cns[pre];
+     data.cns.remove(pre);
  }

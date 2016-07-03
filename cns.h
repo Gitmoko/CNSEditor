@@ -22,7 +22,7 @@ namespace CNS{
     };
     class CNS{
     public:
-        QMap<unsigned,QPair<StateDef,StateBody>>cns;
+        QMap<int,QPair<StateDef,QList<StateBody>>> cns;
     };
 }
 
