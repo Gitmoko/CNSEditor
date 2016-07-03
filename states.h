@@ -15,6 +15,8 @@ public:
     explicit States(QTreeWidget *parent = 0);
     explicit States(int r,QTreeWidget *parent = 0);
     virtual bool operator < (const QTreeWidgetItem & other) const;
+    void setstate(int);
+    int getstate();
     ~States();
 
 };

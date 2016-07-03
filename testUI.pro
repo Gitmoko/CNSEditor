@@ -18,14 +18,16 @@ SOURCES += main.cpp\
     states.cpp \
     addstatesdialog.cpp \
     cns.cpp \
-    csubs.cpp
+    csubs.cpp \
+    statetreeitem.cpp
 
 HEADERS  += mainwindow.h \
     child.h \
     states.h \
     addstatesdialog.h \
     cns.h \
-    csubs.h
+    csubs.h \
+    statetreeitem.h
 
 FORMS    += mainwindow.ui \
     child.ui \

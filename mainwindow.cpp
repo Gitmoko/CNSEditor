@@ -7,6 +7,7 @@
 #include "QJsonArray"
 #include "QFile"
 #include "QDebug"
+#include "statetreeitem.h"
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -14,7 +15,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->treeWidget->addAction(ui->actionAdd);
     connect(ui->treeWidget,&QTreeWidget::currentItemChanged,this,[=](QTreeWidgetItem* next,QTreeWidgetItem* prev){
+
+
         if(prev != nullptr){
+            auto d = prev->columnCount();
+            if(d == 2)
+                return;
+
             int prevstate = prev->text(0).toInt();
             this->savenoweditting(prevstate);
 
@@ -29,6 +36,19 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     });
+
+    connect(ui->treeWidget,&QTreeWidget::itemDoubleClicked,this,[=](QTreeWidgetItem* item,int){
+        if(auto i = dynamic_cast<States*>(item)){
+            auto pre = i->getstate();
+            createstatedialog([=](int next){
+               if( findstate(next).size() == 0){
+                   i->setstate(next);
+                   changeDataState(pre,next);
+               }
+            });
+        }
+
+    });
 }
 
 MainWindow::~MainWindow()
@@ -37,22 +57,25 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::statesadd(){
-    this->setEnabled(false);
-    auto p = new addstatesdialog(this);
-    p->setEnabled(true);
-    p->show();
-    connect(p,&addstatesdialog::newstatenumber,
-            [=](int r){
-       if( ui->treeWidget->findItems(QString::number(r),Qt::MatchFlag::MatchExactly).size() == 0){
-        ui->treeWidget->addTopLevelItem(new States(r));
-        ui->treeWidget->sortItems(0,Qt::SortOrder::AscendingOrder);
+    createstatedialog([=](int r){
+       if(findstate(r).size() == 0){
+            auto s = new States(r);
+            ui->treeWidget->addTopLevelItem(s);
+            ui->treeWidget->sortItems(0,Qt::SortOrder::AscendingOrder);
         }
     });
-    connect(p,&QDialog::finished,
-            [=](int r){
-        this->setEnabled(true);
-    });
 }
+
+void MainWindow::statebodyadd(){
+    auto nowselect = ui->treeWidget->currentItem();
+    if(nowselect != nullptr){
+        auto body = new StateTreeItem();
+        body->setFlags(body->flags());
+        body->setText(0,"comment");
+        nowselect->addChild(body);
+    }
+}
+
 
 void MainWindow::JsonExport(){
     QFile json(tr("test.json"));
@@ -94,3 +117,24 @@ void MainWindow::savenoweditting(int state){
     data[state].first = ui->widget->gettriggers();
     data[state].second = ui->widget_2->getsubs();
 }
+
+QList<QTreeWidgetItem*> MainWindow::findstate(int r){
+    return ui->treeWidget->findItems(QString::number(r),Qt::MatchFlag::MatchExactly,0);
+}
+ void MainWindow::createstatedialog(std::function<void(int)> f){
+     this->setEnabled(false);
+     auto p = new addstatesdialog(this);
+     p->setEnabled(true);
+     p->show();
+     connect(p,&addstatesdialog::newstatenumber,f);
+     connect(p,&QDialog::finished,
+             [=](int ){
+         this->setEnabled(true);
+     });
+
+ }
+
+ void MainWindow::changeDataState(int pre,int next){
+     data[next] = data[pre];
+     data.remove(pre);
+ }

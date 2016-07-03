@@ -6,6 +6,8 @@
 #include <QList>
 #include "csubs.h"
 #include "child.h"
+#include "QTreeWidgetItem"
+#include <functional>
 
 namespace Ui {
 class MainWindow;
@@ -21,12 +23,17 @@ public:
     ~MainWindow();
 public slots:
     void statesadd();
+    void statebodyadd();
     void JsonExport();
+
 public:
     Data data;
 
 private:
     void savenoweditting(int state);
+    void createstatedialog(std::function<void(int)> f);
+    void changeDataState(int pre,int next);
+    QList<QTreeWidgetItem*> findstate(int r);
 
 private:
     Ui::MainWindow *ui;

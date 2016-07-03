@@ -16,6 +16,9 @@
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
     <widget class="QSpinBox" name="inputstate">
+     <property name="minimum">
+      <number>-99999999</number>
+     </property>
      <property name="maximum">
       <number>999999999</number>
      </property>

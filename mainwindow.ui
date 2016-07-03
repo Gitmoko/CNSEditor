@@ -21,7 +21,51 @@
     <property name="sizeConstraint">
      <enum>QLayout::SetDefaultConstraint</enum>
     </property>
-    <item row="4" column="0">
+    <item row="6" column="3">
+     <widget class="QTreeWidget" name="treeWidget">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>200</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="contextMenuPolicy">
+       <enum>Qt::ActionsContextMenu</enum>
+      </property>
+      <property name="sortingEnabled">
+       <bool>true</bool>
+      </property>
+      <column>
+       <property name="text">
+        <string>States</string>
+       </property>
+      </column>
+     </widget>
+    </item>
+    <item row="8" column="3">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>コメント</string>
+      </property>
+     </widget>
+    </item>
+    <item row="10" column="3">
+     <widget class="QTextEdit" name="textEdit">
+      <property name="maximumSize">
+       <size>
+        <width>200</width>
+        <height>16777215</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item row="10" column="0">
      <widget class="CSubs" name="widget_2" native="true">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -40,7 +84,7 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="0">
+    <item row="6" column="0">
      <widget class="child" name="widget" native="true">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -56,11 +100,11 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="2">
+    <item row="0" column="3">
      <widget class="QPushButton" name="pushButton">
       <property name="maximumSize">
        <size>
-        <width>100</width>
+        <width>200</width>
         <height>16777215</height>
        </size>
       </property>
@@ -69,47 +113,10 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="2">
-     <widget class="QTreeWidget" name="treeWidget">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>100</width>
-        <height>16777215</height>
-       </size>
-      </property>
-      <property name="contextMenuPolicy">
-       <enum>Qt::ActionsContextMenu</enum>
-      </property>
-      <property name="sortingEnabled">
-       <bool>true</bool>
-      </property>
-      <column>
-       <property name="text">
-        <string>States</string>
-       </property>
-      </column>
-     </widget>
-    </item>
-    <item row="2" column="2">
-     <widget class="QLabel" name="label">
+    <item row="2" column="3">
+     <widget class="QPushButton" name="addbody">
       <property name="text">
-       <string>コメント</string>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="2">
-     <widget class="QTextEdit" name="textEdit">
-      <property name="maximumSize">
-       <size>
-        <width>100</width>
-        <height>16777215</height>
-       </size>
+       <string>add body</string>
       </property>
      </widget>
     </item>
@@ -192,8 +199,8 @@
    <slot>statesadd()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>515</x>
-     <y>253</y>
+     <x>580</x>
+     <y>64</y>
     </hint>
     <hint type="destinationlabel">
      <x>518</x>
@@ -217,10 +224,26 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>addbody</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>statebodyadd()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>566</x>
+     <y>87</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>593</x>
+     <y>86</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>statesadd()</slot>
   <slot>JsonExport()</slot>
-  <slot>slot2()</slot>
+  <slot>statebodyadd()</slot>
  </slots>
 </ui>
