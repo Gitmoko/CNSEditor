@@ -7,7 +7,9 @@ addstatesdialog::addstatesdialog(QWidget *parent) :
 {
     ui->setupUi(this);
     connect(this,&QDialog::accepted,[=](){
-        emit this->newstatenumber(ui->inputstate->value());
+        auto value = ui->inputstate->value();
+        emit this->newstatenumber(value);
+        delete this;
     });
 }
 

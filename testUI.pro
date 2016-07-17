@@ -13,7 +13,7 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
+	mainwindow.cpp \
     child.cpp \
     states.cpp \
     addstatesdialog.cpp \
@@ -33,3 +33,15 @@ FORMS    += mainwindow.ui \
     child.ui \
     addstatesdialog.ui \
     csubs.ui
+
+
+
+
+win32: LIBS += -L$$PWD/../../../../Mylibs/MyParser/Debug/x64/ -lDLLTest
+
+INCLUDEPATH += $$PWD/../../../../Mylibs/MyParser/include/ \
+		$$PWD/../../../../Mylibs/boost_1_60_0
+DEPENDPATH += $$PWD/../../../../Mylibs/MyParser/include/
+
+win32:!win32-g++: PRE_TARGETDEPS += $$PWD/../../../../Mylibs/MyParser/Debug/x64/DLLTest.lib
+else:win32-g++: PRE_TARGETDEPS += $$PWD/../../../../Mylibs/MyParser/Debug/x64/libDLLTest.a

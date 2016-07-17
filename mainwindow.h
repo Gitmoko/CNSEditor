@@ -26,12 +26,19 @@ public slots:
     void statesadd();
     void statebodyadd();
     void JsonExport();
+    void JsonImport();
 
+public:
+    void addtype();
+    void statebodyadd(int state,std::string tag = "name",CNS::StateBody *data = nullptr);
+    void removeState();
+    void swapStateBody(int state,int index1,int index2);
 public:
     CNS::CNS data;
 
 private:
     void saveeditting(QTreeWidgetItem*);
+    void loadEditor(QTreeWidgetItem*);
     void createstatedialog(std::function<void(int)> f);
     void renameNumberOfState(int pre,int next);
     QList<QTreeWidgetItem*> findstate(int r);
