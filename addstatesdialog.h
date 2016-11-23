@@ -12,10 +12,10 @@ class addstatesdialog : public QDialog
     Q_OBJECT
 
 signals:
-    void newstatenumber(int);
+    void newstatedata(int,QString);
 
 public:
-    explicit addstatesdialog(QWidget *parent = 0);
+    explicit addstatesdialog(QWidget *parent = 0,int statenum = 0,QString tag = "");
     ~addstatesdialog();
 
 private:

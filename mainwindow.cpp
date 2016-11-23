@@ -29,13 +29,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->treeWidget,&QTreeWidget::itemDoubleClicked,this,[=](QTreeWidgetItem* item,int){
         if(auto i = dynamic_cast<States*>(item)){
-            auto pre = i->getstate();
-            createstatedialog([=](int next){
-               if( findstate(next).size() == 0){
-                   i->setstate(next);
-                   renameNumberOfState(pre,next);
-               }
-            });
+            auto prestate = i->getstate();
+            auto pretag = i->gettag();
+            createstatedialog([=](int next,QString nexttag){
+               i->settag(nexttag);
+               i->setstate(next);
+               renameState(prestate,next,nexttag);
+            },prestate,pretag);
         }
     });
 
@@ -101,14 +101,6 @@ MainWindow::MainWindow(QWidget *parent) :
     });
 
 
-    try{
-    auto e = MyParser::parse_impl_debug("{mp,\"ab\",42}");
-    }catch(MyParser::compile_failed c){
-        auto p = new QDialog(this);
-        auto pos = c.pos;
-        new QLabel(tr(pos.c_str()),p);
-        p->show();
-    }
 }
 
 MainWindow::~MainWindow()
@@ -117,12 +109,13 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::statesadd(){
-    createstatedialog([=](int r){
+    createstatedialog([=](int r,QString tag){
        if(findstate(r).size() == 0){
-            auto s = new States(r);
+            auto s = new States(r,tag);
             ui->treeWidget->addTopLevelItem(s);
             ui->treeWidget->sortItems(0,Qt::SortOrder::AscendingOrder);
             this->data.cns.insert(r,decltype(data.cns.value(r)){});
+            this->data.cns[r].first.tag = tag;
         }
     });
 }
@@ -189,6 +182,7 @@ void MainWindow::JsonExport(){
         statedef["substitutions"] = QJsonValue(defsubss);
         statedef["comment"] = data.cns[key].first.Comment;
         statedef["type"] = QJsonValue(deftypes);
+        statedef["tag"] = data.cns[key].first.tag;
 
         QJsonArray statebody;
         for(auto i = 0,end = data.cns[key].second.size();i<end;i++){
@@ -240,6 +234,8 @@ void MainWindow::JsonExport(){
 
 void MainWindow::JsonImport(){
 
+    ui->triggers->setempty();
+    ui->substitutions->setempty();
     QFile jsonfile;
     jsonfile.setFileName("test.json");
     jsonfile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -275,6 +271,10 @@ void MainWindow::JsonImport(){
         auto statedef = statedata["StateDef"].toObject();
         auto statebody = statedata["States"].toArray();
 
+        //set tag
+        const auto tag = statedef["tag"].toString();
+        s->settag(tag);
+        data.cns[key].first.tag = tag;
         //Set statedef
         {
             auto subs = statedef["substitutions"].toArray();
@@ -338,15 +338,22 @@ void MainWindow::saveeditting(QTreeWidgetItem* elem){
 }
 
 QList<QTreeWidgetItem*> MainWindow::findstate(int r){
-    auto ret = ui->treeWidget->findItems(QString::number(r),Qt::MatchFlag::MatchExactly,0);
+    QList<QTreeWidgetItem*> ret;
+    auto size = ui->treeWidget->topLevelItemCount();
+    for(auto i = 0;i<size;i++){
+        auto statedef = dynamic_cast<States*>(ui->treeWidget->topLevelItem(i));
+        if(statedef->getstate() == r){
+            ret.push_back(statedef);
+        }
+    }
     return ret;
 }
- void MainWindow::createstatedialog(std::function<void(int)> f){
+ void MainWindow::createstatedialog(std::function<void(int,QString)> f,int defaultnumber_,QString defaulttag_){
      this->setEnabled(false);
-     auto p = new addstatesdialog(this);
+     auto p = new addstatesdialog(this,defaultnumber_,defaulttag_);
      p->setEnabled(true);
      p->show();
-     connect(p,&addstatesdialog::newstatenumber,f);
+     connect(p,&addstatesdialog::newstatedata,f);
      connect(p,&QDialog::finished,
              [=](int ){
          this->setEnabled(true);
@@ -354,9 +361,12 @@ QList<QTreeWidgetItem*> MainWindow::findstate(int r){
 
  }
 
- void MainWindow::renameNumberOfState(int pre,int next){
-     data.cns[next] = data.cns[pre];
-     data.cns.remove(pre);
+ void MainWindow::renameState(int pre,int next,QString nexttag){
+     data.cns[pre].first.tag = nexttag;
+     if( findstate(next).size() == 0){
+        data.cns[next] = data.cns[pre];
+        data.cns.remove(pre);
+     }
  }
  void MainWindow::loadEditor(QTreeWidgetItem *next){
 

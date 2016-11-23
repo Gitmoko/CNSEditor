@@ -12,12 +12,14 @@ namespace CNS{
         Triggers triggers;
         Substitutions  substitutions;
         QString Comment;
+        QString tag;
         QList<QString> Type;
     };
     class StateDef{
     public:
         Substitutions  substitutions;
         QString Comment;
+        QString tag;
         QList<QString> Type;
     };
     class CNS{

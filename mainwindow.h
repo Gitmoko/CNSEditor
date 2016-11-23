@@ -39,8 +39,8 @@ public:
 private:
     void saveeditting(QTreeWidgetItem*);
     void loadEditor(QTreeWidgetItem*);
-    void createstatedialog(std::function<void(int)> f);
-    void renameNumberOfState(int pre,int next);
+    void createstatedialog(std::function<void(int,QString)> f,int defaultnumber = 0,QString defaulttag = "");
+    void renameState(int pre,int next,QString nexttag);
     QList<QTreeWidgetItem*> findstate(int r);
 
 private:
